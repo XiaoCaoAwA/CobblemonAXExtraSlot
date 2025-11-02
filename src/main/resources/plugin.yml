@@ -1,0 +1,23 @@
+name: CobblemonAXExtraslot
+version: '1.0'
+main: com.example.cobblemonAXExtraslot.CobblemonAXExtraslot
+api-version: '1.21'
+authors: [XiaoCaoAwA]
+depend: [ArcartX]
+
+commands:
+  cae:
+    description: CobblemonAXExtraslot主命令
+    usage: /cae <子命令>
+    aliases: [cobblemonaxextraslot]
+
+permissions:
+  CobbleAXExtraSlot.party:
+    description: 查询宝可梦队伍的权限
+    default: op
+  CobbleAXExtraSlot.item:
+    description: 宝可梦物品相关命令的权限
+    default: op
+  CobbleAXExtraSlot.slot:
+    description: 额外槽位相关命令的权限
+    default: op

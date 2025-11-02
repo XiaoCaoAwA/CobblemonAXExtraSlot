@@ -1,0 +1,5 @@
+# 数据库配置
+database:
+  type: "sqlite"
+  sqlite:
+    filename: "cobblemon_extraslot.db"
