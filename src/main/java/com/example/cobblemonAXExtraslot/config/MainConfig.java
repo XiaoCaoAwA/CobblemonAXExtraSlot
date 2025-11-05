@@ -14,7 +14,7 @@ public class MainConfig extends BaseConfig {
     public static MainConfig INSTANCE;
 
     static {
-        // 延迟初始化，等待插件实例可用
+
     }
 
     public static void initialize(CobblemonAXExtraslot plugin) {
@@ -32,6 +32,20 @@ public class MainConfig extends BaseConfig {
     public void load() {
         super.load();
 
+    }
+
+    /**
+     * 是否开启调试日志输出
+     */
+    public boolean isDebug() {
+        return getBoolean("debug", false);
+    }
+
+    /**
+     * 额外槽位同步时间（秒）
+     */
+    public int getSlotSyncTimeSeconds() {
+        return getInt("SlotSyncTime", 1);
     }
 
 }

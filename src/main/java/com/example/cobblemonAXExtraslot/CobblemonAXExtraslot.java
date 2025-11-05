@@ -1,16 +1,13 @@
 package com.example.cobblemonAXExtraslot;
 
 import com.example.cobblemonAXExtraslot.command.MainCommand;
-import com.example.cobblemonAXExtraslot.config.DatabaseConfig;
 import com.example.cobblemonAXExtraslot.config.MainConfig;
 import com.example.cobblemonAXExtraslot.listener.PlayerJoinListener;
 import com.example.cobblemonAXExtraslot.manager.PartySlotSyncManager;
 import xiaocaoawa.miencraft.plugin.xccore.util.CobblemonUtil.CobblemonPartyUtil;
+import com.example.cobblemonAXExtraslot.util.DebugLogger;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
-import priv.seventeen.artist.arcartx.core.config.setting.Database;
-import priv.seventeen.artist.arcartx.database.DatabaseManager;
-import priv.seventeen.artist.arcartx.database.slot.SlotDatabase;
 
 public final class CobblemonAXExtraslot extends JavaPlugin {
 
@@ -18,9 +15,6 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
     private static CobblemonAXExtraslot instance;
 
     private MainCommand mainCommand;
-    private DatabaseManager databaseManager;
-    @Getter
-    private SlotDatabase slotDatabase;
     @Getter
     private PartySlotSyncManager syncManager;
     private PlayerJoinListener playerJoinListener;
@@ -33,8 +27,6 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
         MainConfig.initialize(this);
         MainConfig.INSTANCE.load();
 
-        initializeDatabase();
-
         initializeCobblemonUtils();
 
         registerCommands();
@@ -45,46 +37,15 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
 
         startPartySlotSyncTask();
         
-        getLogger().info("CobblemonAXExtraslot 插件启动完成！");
+        DebugLogger.info(this, "CobblemonAXExtraslot 插件启动完成！");
     }
 
     @Override
     public void onDisable() {
-
+        // 停止同步任务
         stopPartySlotSyncTask();
 
-        if (databaseManager != null) {
-            databaseManager.close();
-            getLogger().info("数据库连接已关闭");
-        }
-    }
-
-    /**
-     * 初始化数据库
-     */
-    private void initializeDatabase() {
-        try {
-            Database sqlConfig = DatabaseConfig.createFromConfig(this, MainConfig.INSTANCE);
-            
-            if (sqlConfig == null) {
-                getLogger().severe("数据库配置创建失败");
-                return;
-            }
-
-            databaseManager = new DatabaseManager(sqlConfig);
-            slotDatabase = databaseManager.getSlotDatabase();
-            
-            if (slotDatabase == null) {
-                getLogger().severe("SlotDatabase 初始化失败");
-                return;
-            }
-            
-            getLogger().info("SQLite 数据库初始化成功！");
-            
-        } catch (Exception e) {
-            getLogger().severe("数据库初始化失败: " + e.getMessage());
-            e.printStackTrace();
-        }
+        DebugLogger.info(this, "CobblemonAXExtraslot 插件已关闭！");
     }
 
     /**
@@ -93,9 +54,10 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
     private void initializeCobblemonUtils() {
         try {
             CobblemonPartyUtil.setInitialized();
-            getLogger().info("Cobblemon工具初始化成功");
+            DebugLogger.info(this, "Cobblemon工具初始化成功");
         } catch (Exception e) {
-            getLogger().warning("Cobblemon工具初始化失败: " + e.getMessage());
+            DebugLogger.warning(this, "Cobblemon工具初始化失败: " + e.getMessage());
+            DebugLogger.printStackTraceIfDebug(e);
         }
     }
 
@@ -104,13 +66,14 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
      */
     private void registerCommands() {
         try {
-            mainCommand = new MainCommand(slotDatabase);
+            mainCommand = new MainCommand();
             getCommand("cae").setExecutor(mainCommand);
             getCommand("cae").setTabCompleter(mainCommand);
             
-            getLogger().info("命令注册成功");
+            DebugLogger.info(this, "命令注册成功");
         } catch (Exception e) {
-            getLogger().severe("命令注册失败: " + e.getMessage());
+            DebugLogger.severe(this, "命令注册失败: " + e.getMessage());
+            DebugLogger.printStackTraceIfDebug(e);
         }
     }
     
@@ -122,10 +85,10 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
             playerJoinListener = new PlayerJoinListener(this, syncManager.getSyncService());
             getServer().getPluginManager().registerEvents(playerJoinListener, this);
             
-            getLogger().info("事件监听器注册成功");
+            DebugLogger.info(this, "事件监听器注册成功");
         } catch (Exception e) {
-            getLogger().severe("事件监听器注册失败: " + e.getMessage());
-            e.printStackTrace();
+            DebugLogger.severe(this, "事件监听器注册失败: " + e.getMessage());
+            DebugLogger.printStackTraceIfDebug(e);
         }
     }
 
@@ -134,11 +97,11 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
      */
     private void initializeSyncManager() {
         try {
-            syncManager = new PartySlotSyncManager(this, slotDatabase);
-            getLogger().info("队伍同步管理器初始化成功");
+            syncManager = new PartySlotSyncManager(this);
+            DebugLogger.info(this, "队伍同步管理器初始化成功");
         } catch (Exception e) {
-            getLogger().severe("队伍同步管理器初始化失败: " + e.getMessage());
-            e.printStackTrace();
+            DebugLogger.severe(this, "队伍同步管理器初始化失败: " + e.getMessage());
+            DebugLogger.printStackTraceIfDebug(e);
         }
     }
 
@@ -149,7 +112,7 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
         if (syncManager != null) {
             syncManager.start();
         } else {
-            getLogger().warning("同步管理器未初始化，无法启动队伍同步任务");
+            DebugLogger.warning(this, "同步管理器未初始化，无法启动队伍同步任务");
         }
     }
     

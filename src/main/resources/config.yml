@@ -1,5 +1,5 @@
-# 数据库配置
-database:
-  type: "sqlite"
-  sqlite:
-    filename: "cobblemon_extraslot.db"
+# 调试模式 开关
+debug: false
+
+# 额外槽位同步时间（秒）
+SlotSyncTime: 1

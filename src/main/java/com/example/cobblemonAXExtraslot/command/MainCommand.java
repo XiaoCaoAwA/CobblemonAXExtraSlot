@@ -1,17 +1,13 @@
 package com.example.cobblemonAXExtraslot.command;
 
 import org.jetbrains.annotations.Nullable;
-import priv.seventeen.artist.arcartx.database.slot.SlotDatabase;
 
 /**
  * 命令管理器，用于注册和管理所有子命令
  */
 public class MainCommand extends AbstractMainCommand {
 
-    private final SlotDatabase slotDatabase;
-
-    public MainCommand(SlotDatabase slotDatabase) {
-        this.slotDatabase = slotDatabase;
+    public MainCommand() {
         // 注册所有子命令
         registerSubCommands();
     }
@@ -30,7 +26,7 @@ public class MainCommand extends AbstractMainCommand {
         registerSubCommand(new ItemCommand());
         
         // 注册slot命令
-        registerSubCommand(new SlotCommand(slotDatabase));
+        registerSubCommand(new SlotCommand());
     }
 
     @Override

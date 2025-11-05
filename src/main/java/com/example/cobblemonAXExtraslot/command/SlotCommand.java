@@ -7,10 +7,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import com.example.cobblemonAXExtraslot.util.CobblemonLoreBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import priv.seventeen.artist.arcartx.database.slot.SlotDatabase;
-import xiaocaoawa.miencraft.plugin.xccore.util.CobblemonUtil.CobblemonItemUtil;
+import priv.seventeen.artist.arcartx.core.entity.data.ArcartXPlayer;
+// 生成物品的逻辑已集中到 PokemonItemLoreBuilder
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,10 +23,7 @@ import java.util.List;
  */
 public class SlotCommand extends SubCommand {
     
-    private final SlotDatabase slotDatabase;
-    
-    public SlotCommand(SlotDatabase slotDatabase) {
-        this.slotDatabase = slotDatabase;
+    public SlotCommand() {
     }
 
     @Override
@@ -110,14 +108,12 @@ public class SlotCommand extends SubCommand {
         String slotStr = args[2];
         String extraSlotName = args[3];
 
-        // 获取目标玩家
         Player targetPlayer = Bukkit.getPlayer(targetPlayerName);
         if (targetPlayer == null) {
             sender.sendMessage("§c玩家 " + targetPlayerName + " 不在线或不存在。");
             return;
         }
 
-        // 解析槽位参数
         int slot;
         try {
             slot = Integer.parseInt(slotStr);
@@ -127,13 +123,11 @@ public class SlotCommand extends SubCommand {
             return;
         }
 
-        // 检查槽位范围
         if (slot < 1 || slot > 6) {
             sender.sendMessage("§c槽位必须在 1-6 之间，你输入的是: " + slot);
             return;
         }
 
-        // 获取目标玩家的宝可梦队伍
         List<Pokemon> partyPokemon = CobblemonUtil.getPartyPokemon(targetPlayer);
         
         if (partyPokemon.isEmpty()) {
@@ -141,41 +135,29 @@ public class SlotCommand extends SubCommand {
             return;
         }
 
-        // 检查指定槽位是否有宝可梦
         if (slot > partyPokemon.size()) {
             sender.sendMessage("§c玩家 " + targetPlayerName + " 的槽位 " + slot + " 没有宝可梦。");
             return;
         }
 
-        // 获取指定槽位的宝可梦
-        Pokemon pokemon = partyPokemon.get(slot - 1); // 数组索引从0开始
+        Pokemon pokemon = partyPokemon.get(slot - 1);
         if (pokemon == null) {
             sender.sendMessage("§c玩家 " + targetPlayerName + " 的槽位 " + slot + " 没有宝可梦。");
             return;
         }
 
-        // 使用 XCCore API 获取宝可梦照片物品
-        ItemStack pokemonItem = CobblemonItemUtil.getPokemonItem(pokemon);
-        if (pokemonItem == null) {
-            sender.sendMessage("§c无法获取宝可梦照片，请稍后再试。");
-            return;
-        }
-
-        if (slotDatabase == null) {
-            sender.sendMessage("§c槽位数据库未初始化，请联系管理员。");
-            return;
-        }
-
         try {
-
-            slotDatabase.setSlotData(targetPlayer.getUniqueId(), extraSlotName, pokemonItem);
+            ItemStack pokemonItem = CobblemonLoreBuilder.buildPokemonItemWithLore(pokemon, slot);
+            if (pokemonItem == null) {
+                sender.sendMessage("§c无法获取宝可梦照片，请稍后再试。");
+                return;
+            }
+            ArcartXPlayer arcartXPlayer = new ArcartXPlayer(targetPlayer);
+            arcartXPlayer.setSlotItemStackOnlyClient(extraSlotName, pokemonItem);
             
             String pokemonName = CobblemonUtil.getPokemonDisplayName(pokemon);
             sender.sendMessage("§a成功将玩家 §f" + targetPlayerName + " §a的槽位 §f" + slot + " §a中的宝可梦照片 §f" + pokemonName + " §a设置到额外槽位 §f" + extraSlotName);
 
-            if (targetPlayer.isOnline()) {
-                targetPlayer.sendMessage("§a你的宝可梦照片 §f" + pokemonName + " §a已被设置到额外槽位 §f" + extraSlotName);
-            }
             
         } catch (Exception e) {
             sender.sendMessage("§c设置额外槽位时发生错误: " + e.getMessage());
