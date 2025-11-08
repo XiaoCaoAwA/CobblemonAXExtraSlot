@@ -2,6 +2,7 @@ package com.example.cobblemonAXExtraslot;
 
 import com.example.cobblemonAXExtraslot.command.MainCommand;
 import com.example.cobblemonAXExtraslot.config.MainConfig;
+import com.example.cobblemonAXExtraslot.listener.ExtraSlotClickListener;
 import com.example.cobblemonAXExtraslot.listener.PlayerJoinListener;
 import com.example.cobblemonAXExtraslot.manager.PartySlotSyncManager;
 import xiaocaoawa.miencraft.plugin.xccore.util.CobblemonUtil.CobblemonPartyUtil;
@@ -18,6 +19,7 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
     @Getter
     private PartySlotSyncManager syncManager;
     private PlayerJoinListener playerJoinListener;
+    private ExtraSlotClickListener extraSlotClickListener;
 
     @Override
     public void onEnable() {
@@ -84,6 +86,9 @@ public final class CobblemonAXExtraslot extends JavaPlugin {
         try {
             playerJoinListener = new PlayerJoinListener(this, syncManager.getSyncService());
             getServer().getPluginManager().registerEvents(playerJoinListener, this);
+            
+            extraSlotClickListener = new ExtraSlotClickListener();
+            getServer().getPluginManager().registerEvents(extraSlotClickListener, this);
             
             DebugLogger.info(this, "事件监听器注册成功");
         } catch (Exception e) {

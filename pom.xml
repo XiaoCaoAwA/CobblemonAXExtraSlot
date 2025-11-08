@@ -83,6 +83,20 @@
             <id>Fabric</id>
             <url>https://maven.fabricmc.net/</url>
         </repository>
+        <repository>
+            <id>coding-artifacts</id>
+            <url>https://seventeen-artist-maven.pkg.coding.net/repository/arcartx/public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>taboolib-repo</id>
+            <url>https://repo.tabooproject.org/repository/releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -189,11 +203,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>ArcartX-1.8.637</groupId>
-            <artifactId>ArcartX-1.8.637</artifactId>
-            <version>1.8.637</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/ArcartX-1.8.637.jar</systemPath>
+            <groupId>priv.seventeen.artist.arcartx</groupId>
+            <artifactId>ArcartX</artifactId>
+            <version>1.8.653.23</version>
+            <classifier>api</classifier>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>XCCore-1.0</groupId>
@@ -201,6 +215,12 @@
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/libs/XCCore-1.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>io.izzel.taboolib</groupId>
+            <artifactId>platform-bukkit</artifactId>
+            <version>6.2.3-7105e58f</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
